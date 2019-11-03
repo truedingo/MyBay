@@ -15,8 +15,11 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+from mybay_app import views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'^$', views.home_view.as_view(), name='home'),
+    url(r'^signup/', views.signup_view.as_view(), name='signup'),
 ]
 
