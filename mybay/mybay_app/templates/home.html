@@ -1,0 +1,6 @@
+<form method="post">
+    {% csrf_token %}
+    {{ login_form.as_p }}
+    <button type="button_login">Login</button>
+</form>
+<button type="button_signup" onclick="location.href={% url 'signup'%}">Signup</button> 
