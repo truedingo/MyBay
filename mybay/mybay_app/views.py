@@ -3,9 +3,11 @@ from __future__ import unicode_literals
 
 from django.shortcuts import render
 from django.views.generic import View
-from mybay_app.forms import SignUpForm, ProfileForm, LoginForm
+from mybay_app.forms import SignUpForm, ProfileForm, LoginForm, ItemForm
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.hashers import make_password, check_password
+from mybay_app.models import Profile, Item
+from django.contrib import messages
 
 class home_view(View):
     def get(self, request):
@@ -34,6 +36,8 @@ class home_view(View):
 
 class signup_view(View):
     def get(self, request):
+        if request.user.is_authenticated:
+            return render(request, "main_page.html")
         prof_form = ProfileForm()
         signup_form = SignUpForm()
         return render(request, 'signup.html', {"signup_form": signup_form, "prof_form": prof_form})
@@ -60,12 +64,22 @@ class signup_view(View):
                 print("Erro")
         else:
             return render(request, 'signup.html', {"signup_form": signup_form, "prof_form": prof_form})
-        '''
-        if signup_form.is_valid() and user_form.is_valid():
-            signup_form.save()
-            return render(request, 'main_page.html')
-        else:
-            return render(request, 'signup.html', {"forms": signup_form})
-        '''
+    
+class item_view(View):
+    def get(self, request):
+        item_form = ItemForm()
+        return render(request, 'item.html', {"item_form": item_form})
 
-# Create your views here.
+    def post(self, request):
+        item_form = ItemForm(request.POST, request.FILES)
+        if item_form.is_valid():
+            item_form = item_form.save(commit=False)
+            item_owner = Profile.objects.get(user=request.user)
+            item_form.item_owner = item_owner
+            item_form.save()
+            item_form = ItemForm()
+            messages.success(request, 'Item added')
+            return render(request, 'item.html', {'item_form': item_form})
+        else:
+            # meter erro aqui
+            print("Erro")

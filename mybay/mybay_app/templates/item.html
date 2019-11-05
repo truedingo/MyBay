@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en">
+{% load static %}
 
 <head>
     <!-- Required meta tags -->
@@ -9,8 +10,8 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    
 
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
     <title>MyBay</title>
 </head>
 
@@ -24,17 +25,17 @@
 
         <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
             <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-                <li class="nav-item active">
-                    <a class="nav-link" href="{% url 'home'%}">Home<span class="sr-only">(current)</span></a>
-                </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="{% url 'home'%}"">Home<span class=" sr-only">Home</span></a>
+                </li>
+                <li class="nav-item active">
                     <a class="nav-link" href="{% url 'item'%}">Items</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">My Profile</a>
                 </li>
                 <li class="nav-item">
-                        <a class="nav-link" href="#">Logout</a>
+                    <a class="nav-link" href="#">Logout</a>
                 </li>
             </ul>
             <form class="form-inline my-2 my-lg-0">
@@ -43,7 +44,18 @@
             </form>
         </div>
     </nav>
-    TOU NA HOME PAGE!
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ item_form.as_p }}
+        <button type="submit" class="btn btn-black">Add Item</button>
+    </form>
+    {% if messages %}
+        {% for message in messages %}
+        <div class = "alert alert-success" display="inline-block" role="alert">
+            {{ message }}
+        </div>
+    {% endfor %}
+    {% endif %}
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
