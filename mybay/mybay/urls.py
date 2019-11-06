@@ -21,6 +21,10 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', views.home_view.as_view(), name='home'),
     url(r'^signup/', views.signup_view.as_view(), name='signup'),
-    url(r'^item_view/', views.item_view.as_view(), name='item')
+    url(r'^items/', views.item_view.as_view(), name='item'),
+    url(r'logout/', views.logout_view, name='logout'),
+    url(r'^user_delete/', views.user_delete_view.as_view(), name='userdelete'),
+    url(r'^user_edit/', views.user_edit_view.as_view(), name='useredit'),
+    url(r'^item_edit/', views.item_edit_view.as_view(), name='itemedit'),
 ]
 

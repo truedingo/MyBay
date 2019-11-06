@@ -12,7 +12,7 @@ class Profile(models.Model):
 class Item(models.Model):
     item_name = models.CharField(max_length=512, verbose_name="name")
     item_category = models.CharField(max_length=512, verbose_name="category")
-    item_price = models.IntegerField(verbose_name="price")
+    item_price = models.FloatField(verbose_name="price")
     item_date = models.DateField(auto_now_add=True, blank=True)
     item_pic = models.ImageField(verbose_name="item's Picture", upload_to = 'images/')
     item_owner = models.ForeignKey('Profile', on_delete = models.CASCADE, verbose_name="user")

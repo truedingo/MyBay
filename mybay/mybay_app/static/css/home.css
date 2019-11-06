@@ -3,7 +3,6 @@ body {
 }
 
 
-
 .main-head{
     height: 150px;
     background: #FFF;
@@ -80,4 +79,13 @@ body {
 
 .alert-success{
     display: inline-block;
+}
+
+.form-center{
+    display: grid;
+    justify-content: center;
+}
+
+.label-adjust{
+    padding-right: 10px;
 }

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.generic import View
-from mybay_app.forms import SignUpForm, ProfileForm, LoginForm, ItemForm
-from django.contrib.auth import authenticate, login
+from mybay_app.forms import SignUpForm, ProfileForm, LoginForm, ItemForm, UserDeleteForm, UserEditForm
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.hashers import make_password, check_password
 from mybay_app.models import Profile, Item
 from django.contrib import messages
@@ -83,3 +83,60 @@ class item_view(View):
         else:
             # meter erro aqui
             print("Erro")
+
+def logout_view(request):
+    logout(request)
+    login_form = LoginForm()
+    return redirect('home')
+
+
+class user_delete_view(View):
+    def get(self, request):
+        user_delete_form = UserDeleteForm()
+        return render(request, 'user_delete.html', {'user_delete_form': user_delete_form})
+
+    def post(self, request):
+        user_delete_form = UserDeleteForm(request.POST)
+        user = request.user
+        if user_delete_form.data['password'] == user_delete_form.data['password_check'] and user.check_password(user_delete_form.data['password']):
+            user_profile = Profile.objects.get(user=user)
+            user.delete()
+            user_profile.delete()
+            return render(request, 'home.html')
+        else:
+            #meter erro aqui
+            return render(request, 'user_delete.html', {'user_delete_form': user_delete_form})
+
+class user_edit_view(View):
+    def get(self, request):
+        user_edit_form = UserEditForm()
+        return render(request, 'user_edit.html', {'user_edit_form': user_edit_form})
+
+    def post(self, request):
+        user_edit_form = UserEditForm(request.POST)
+        user = request.user
+        user_profile = Profile.objects.get(user=user) 
+        if user_edit_form.is_valid() and user.check_password(user_edit_form.data['old_password']):
+            user.password = make_password(user_edit_form.data['new_password'])
+            user.username = user_edit_form.data['new_username']
+            user.email = user_edit_form.data['new_username']
+            user_profile.user_country = user_edit_form.data['new_country']
+            user.save()
+            user_profile.save()
+            return render(request, 'home.html')
+        else:
+            #meter erro aqui
+            print('erro')
+            return render(request, 'user_edit.html', {'user_edit_form': user_edit_form})
+
+class item_edit_view(View):
+    def get(self, request):
+        return render(request, 'item_edit.html')
+
+    def post(self, request):
+        user = request.user
+        user_profile = Profile.objects.get(user=user) 
+        list_of_items = Item.objects.filter(item_owner=user_profile)
+        print(list_of_items)
+        return render(request, 'item_edit.html')
+        

@@ -36,4 +36,14 @@ class ItemForm(forms.ModelForm):
     class Meta:
         model = Item
         fields = ('item_name', 'item_category', 'item_price', 'item_pic',)
+
+class UserDeleteForm(forms.Form):
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': "form-control"}),)
+    password_check = forms.CharField(label="Password Confirmation", widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+
+class UserEditForm(forms.Form):
+    new_username = forms.EmailField(label='New email', widget=forms.TextInput(attrs={'class': "form-control"}),)
+    new_country = forms.ChoiceField(choices=list(countries), widget=forms.Select(attrs={'class': 'form-control'}))
+    old_password = forms.CharField(label="Old Password", widget=forms.PasswordInput(attrs={'class': "form-control"}),)
+    new_password = forms.CharField(label="New Password", widget=forms.PasswordInput(attrs={'class': "form-control"}),)
     
