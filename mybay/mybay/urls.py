@@ -16,6 +16,9 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 from mybay_app import views
+from django.contrib.staticfiles.urls import static
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from mybay import settings
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -26,5 +29,11 @@ urlpatterns = [
     url(r'^user_delete/', views.user_delete_view.as_view(), name='userdelete'),
     url(r'^user_edit/', views.user_edit_view.as_view(), name='useredit'),
     url(r'^item_edit/', views.item_edit_view.as_view(), name='itemedit'),
+    url(r'^main_page/', views.home_page_view.as_view(), name='mainpage'),
+    url(r'^my_profile/', views.profile_view.as_view(), name='profile')
 ]
+
+
+urlpatterns += staticfiles_urlpatterns()
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

@@ -29,11 +29,11 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'home'%}">Home<span class="sr-only">(current)</span></a>
                 </li>
-                <li class="nav-item active">
+                <li class="nav-item">
                     <a class="nav-link" href="{% url 'item'%}">Items</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'profile' %}">My Profile</a>
+                <li class="nav-item active">
+                    <a class="nav-link" href="{% url 'profile'%}">My Profile</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'logout'%}">Logout</a>
@@ -41,48 +41,30 @@
             </ul>
             <form class="form-inline my-2 my-lg-0" method="post">
                 {% csrf_token %}
-                <input class="form-control mr-sm-2" name= "search_text" type="custom_search" placeholder="Search" aria-label="Search">
-                <button type="submit" name= "custom_search"class="btn btn-outline-light">Search</button>
+                <input class="form-control mr-sm-2" name="search_text" type="custom_search" placeholder="Search"
+                    aria-label="Search">
+                <button type="submit" name="custom_search" class="btn btn-outline-light">Search</button>
             </form>
         </div>
     </nav>
     <div id="wrapper">
         <div id="sidebar-wrapper">
             <ul class="sidebar-nav">
-                <li><a href="{% url 'itemedit'%}">Edit Items</a></li>
-                <li><a href="#">Remove Items</a></li>
+                <li><a href="{% url 'useredit'%}">Edit Profile</a></li>
+                <li><a href="{% url 'userdelete'%}">Delete Profile</a></li>
             </ul>
         </div>
-        <form method="post" enctype="multipart/form-data" class="form-center">
-            <h1> Add Item</h1>
-            {% csrf_token %}
-            <div class="form-group" style="padding-top: 100px;">
-                <label class="label-adjust">Item Name</label>
-                {{ item_form.item_name }}
-            </div>
-            <div class="form-group">
-                <label class="label-adjust">Category</label>
-                {{ item_form.item_category }}
-            </div>
-            <div class="form-group">
-                <label class="label-adjust">Price</label>
-                {{ item_form.item_price }}
-            </div>
-            <div class="form-group">
-                <label class="label-adjust">Picture</label>
-                {{ item_form.item_pic }}
-            </div>
-            <button type="submit" class="btn btn-black">Add Item</button>
-            {% if messages %}
-            {% for message in messages %}
-            <div class="message" id="message_container">
-                <div class="alert alert-success" display="inline-block" role="alert">
-                    {{ message }}
-                </div>
-            </div>
-            {% endfor %}
-            {% endif %}
-        </form>
+    <div class='center-things'>
+    <h1>My Profile</h1>
+    {% for item in item_list %}
+        {{ item.item_name }}<br>
+        {{ item.item_category }}<br>
+        {{ item.item_date }}<br>
+        {{ item.item_price }}<br>
+        <img src="{{ item.item_pic.url }}" /> 
+    {% endfor %}
+    </div>
+
         <!-- Optional JavaScript -->
         <!-- jQuery first, then Popper.js, then Bootstrap JS -->
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"

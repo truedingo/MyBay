@@ -89,3 +89,8 @@ body {
 .label-adjust{
     padding-right: 10px;
 }
+
+.center-things{
+    display: grid;
+    justify-items: center;
+}

@@ -3,6 +3,20 @@ from mybay_app.models import Profile, Item
 from django.contrib.auth.models import User
 from django_countries.fields import CountryField
 from django_countries import countries
+import datetime
+
+CAT_CHOICE = [
+    (None, 'None'),
+    ('Lifestyle', 'Lifestyle'),
+    ('Technology', 'Technology'),
+    ('Kitchen', 'Kitchen'),
+]
+
+SEARCH_ATTRIBUTES = [
+    (None, 'None'),
+    ('ascending', 'Ascending'),
+    ('descending', 'Descending'),
+]
 
 
 class SignUpForm(forms.ModelForm):
@@ -46,4 +60,18 @@ class UserEditForm(forms.Form):
     new_country = forms.ChoiceField(choices=list(countries), widget=forms.Select(attrs={'class': 'form-control'}))
     old_password = forms.CharField(label="Old Password", widget=forms.PasswordInput(attrs={'class': "form-control"}),)
     new_password = forms.CharField(label="New Password", widget=forms.PasswordInput(attrs={'class': "form-control"}),)
+
+class SearchForm(forms.Form):
+    category_select = forms.CharField(widget=forms.Select(choices=CAT_CHOICE), required=False, label='')
+    my_country = forms.BooleanField(required=False)
+    name_select = forms.CharField(widget=forms.Select(choices=SEARCH_ATTRIBUTES), required=False, label="Name")
+    price_min = forms.FloatField(required=False)
+    price_max = forms.FloatField(required=False)
+    date_select = forms.CharField(widget=forms.Select(choices=SEARCH_ATTRIBUTES), required=False)
+    after_date = forms.DateField(widget=forms.DateInput(format = '%Y-%m-%d'), required=False)
+
+
+
+
+
     
