@@ -10,6 +10,7 @@ CAT_CHOICE = [
     ('Lifestyle', 'Lifestyle'),
     ('Technology', 'Technology'),
     ('Kitchen', 'Kitchen'),
+    ('Clothes', 'Clothes')
 ]
 
 SEARCH_ATTRIBUTES = [
@@ -58,7 +59,7 @@ class UserDeleteForm(forms.Form):
 
 class UserEditForm(forms.Form):
     new_username = forms.EmailField(label='New email', widget=forms.TextInput(attrs={'class': "form-control"}),)
-    new_country = CountryField()
+    new_country = CountryField().formfield()
     old_password = forms.CharField(label="Old Password", widget=forms.PasswordInput(attrs={'class': "form-control"}),)
     new_password = forms.CharField(label="New Password", widget=forms.PasswordInput(attrs={'class': "form-control"}),)
 
@@ -73,6 +74,7 @@ class SearchForm(forms.Form):
     after_date = forms.DateField(widget=forms.DateInput(), required=False)
 
 class ItemEditForm(forms.ModelForm):
+    item_category = forms.CharField(widget=forms.Select(choices=CAT_CHOICE), required=False, label='')
     class Meta:
         model = ItemEdit
         fields = ('item_list', 'item_name', 'item_category', 'item_country', 'item_price', 'item_pic',)

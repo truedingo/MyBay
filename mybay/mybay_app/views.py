@@ -28,8 +28,7 @@ class home_view(View):
                 login(request, user)
                 return redirect('mainpage')
             else:
-                # meter mensagem de erro aqui
-                print("erro")
+                return redirect('mainpage')
         else:
             return render(request, 'home.html', {"login_form": login_form})
 
@@ -86,7 +85,8 @@ class item_view(View):
             return redirect('item')
         else:
             # meter erro aqui
-            print("Erro")
+            messages.error(request, 'Problem adding item, check your fields.')
+            return redirect('item')
 
 def logout_view(request):
     logout(request)
@@ -125,13 +125,20 @@ class user_edit_view(View):
         user = request.user
         user_profile = Profile.objects.get(user=user) 
         if user_edit_form.is_valid() and user.check_password(user_edit_form.data['old_password']):
+            username = user_edit_form.data['new_username']
+            password = user_edit_form.data['new_password']
             user.password = make_password(user_edit_form.data['new_password'])
             user.username = user_edit_form.data['new_username']
             user.email = user_edit_form.data['new_username']
             user_profile.user_country = user_edit_form.data['new_country']
             user.save()
             user_profile.save()
-            return redirect('profile')
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('profile')
+            else:
+                return redirect('home')
         else:
             #meter erro aqui
             print('erro')
@@ -211,7 +218,8 @@ class home_page_view(View):
                 print(item_list)
                 return render(request, 'main_page.html', {'item_list': item_list, 'search_form': search_form})
             else:
-                print("ripppp")
+                #erro
+                print("erro aqui")
         return redirect('home')
 
 class profile_view(View):
@@ -221,13 +229,15 @@ class profile_view(View):
         my_user = request.user
         my_profile = Profile.objects.get(user=my_user)
         item_list = Item.objects.filter(item_owner=my_profile).order_by('item_date')
-        return render(request, 'profile.html', {'item_list': item_list})
+        return render(request, 'profile.html', {'item_list': item_list, 'profile': my_profile})
     def post(self, request):
         return redirect('profile')
 
 
 class item_edit_view(View):
     def get(self, request):
+        if not request.user.is_authenticated:
+            return redirect('home')
         item_edit_form = ItemEditForm(request.user)
         return render(request, 'item_edit.html', {'item_edit_form': item_edit_form})
 
@@ -239,10 +249,13 @@ class item_edit_view(View):
         item_on_focus.item_price = item_edit_form.data['item_price']
         item_on_focus.item_pic = item_edit_form.files['item_pic']
         item_on_focus.save()
-        return redirect('item')
+        messages.success(request, 'Item editted')
+        return redirect('itemedit')
         
 class item_delete_view(View):
     def get(self, request):
+        if not request.user.is_authenticated:
+            return redirect('home')
         item_delete_form = ItemDeleteForm(request.user)
         return render(request, 'item_delete.html', {'item_delete_form': item_delete_form})
 
@@ -250,13 +263,8 @@ class item_delete_view(View):
         item_delete_form = ItemDeleteForm(request.user, request.POST)
         item_on_focus = Item.objects.get(pk=item_delete_form.data['item_list'])
         item_on_focus.delete()
-        return redirect('item')
-
-
-class test_items(View):
-    def get(self, request):
-        item_list = Item.objects.all()
-        return render(request, 'test_items.html', {'item_list': item_list})
+        messages.success(request, 'Item deleted')
+        return redirect('itemdelete')
 
     
  

@@ -54,9 +54,9 @@
             </ul>
         </div>
         <form method="post" enctype="multipart/form-data" class="form-center">
-            <h1> Add Item</h1>
             {% csrf_token %}
-            <div class="form-group" style="padding-top: 100px;">
+            <h1 style="display: flex;justify-content: center;padding-top: 50px;padding-bottom: 50px;"> Add Item</h1>
+            <div class="form-group">
                 <label class="label-adjust">Item Name</label>
                 {{ item_form.item_name }}
             </div>

@@ -41,6 +41,15 @@
          </div>
       </div>
    </div>
+   {% if messages %}
+   {% for message in messages %}
+   <div class="message" id="message_container">
+       <div class="alert alert-success" display="inline-block" role="alert">
+           {{ message }}
+       </div>
+   </div>
+   {% endfor %}
+   {% endif %}
 
    <!-- Optional JavaScript -->
    <!-- jQuery first, then Popper.js, then Bootstrap JS -->

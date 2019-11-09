@@ -32,7 +32,6 @@ urlpatterns = [
     url(r'^item_delete/', views.item_delete_view.as_view(), name='itemdelete'),
     url(r'^main_page/', views.home_page_view.as_view(), name='mainpage'),
     url(r'^my_profile/', views.profile_view.as_view(), name='profile'),
-    url(r'^teste/', views.test_items.as_view(), name='teste')
 ]
 
 

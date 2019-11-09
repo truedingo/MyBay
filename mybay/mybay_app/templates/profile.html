@@ -13,6 +13,7 @@
 
     <link rel="stylesheet" href="{% static 'css/home.css' %}">
     <link rel="stylesheet" href="{% static 'css/side_nav.css' %}">
+    <link rel="stylesheet" href="{% static 'css/items_sel.css' %}">
     <title>MyBay</title>
 </head>
 
@@ -54,16 +55,31 @@
                 <li><a href="{% url 'userdelete'%}">Delete Profile</a></li>
             </ul>
         </div>
-    <div class='center-things'>
-    <h1>My Profile</h1>
-    {% for item in item_list %}
-        {{ item.item_name }}<br>
-        {{ item.item_category }}<br>
-        {{ item.item_date }}<br>
-        {{ item.item_price }}<br>
-        <img src="{{ item.item_pic.url }}" /> 
-    {% endfor %}
-    </div>
+        <h1 style="display: flex;justify-content: center;padding-top: 50px;"> My Profile</h1>
+        <h3 style="display: flex;justify-content: center"> {{request.user}} </h3>
+        <h3 style="display: flex;justify-content: center"> {{profile.user_country.name}} </h3>
+        <div class="container">
+                <div class="row">
+                    <div class="col-lg-8 col-md-8 col-sm-9 col-xs-12">
+                        {% for item in item_list %}
+                        <article>
+                            <div class="row">
+                                <div class="col-sm-6 col-md-4">
+                                    <figure>
+                                        <img src="{{ item.item_pic.url }}" />
+                                    </figure>
+                                </div>
+                                <div class="col-sm-6 col-md-8">
+                                    <br>
+                                    <h4>{{ item.item_name }}</h4>
+                                    <label><b>Category</b></label> {{item.item_category}}<br>
+                                    <label><b>Country of Origin:</b></label> {{item.item_country.name}}<br>
+                                    <label><b>Price:</b></label> {{item.item_price}}<br>
+                                    <label><b>Added Date:</b></label> {{item.item_date}}
+                                </div>
+                            </div>
+                        </article>
+                        {% endfor %}
 
         <!-- Optional JavaScript -->
         <!-- jQuery first, then Popper.js, then Bootstrap JS -->
