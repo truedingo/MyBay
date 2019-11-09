@@ -1,5 +1,5 @@
 from django import forms
-from mybay_app.models import Profile, Item
+from mybay_app.models import Profile, Item, ItemEdit
 from django.contrib.auth.models import User
 from django_countries.fields import CountryField
 from django_countries import countries
@@ -36,7 +36,6 @@ class SignUpForm(forms.ModelForm):
         return cleaned_data
 
 class ProfileForm(forms.ModelForm):
-    user_country = forms.ChoiceField(choices=list(countries), widget=forms.Select(attrs={'class': 'form-control'}))
     class Meta:
         model = Profile
         labels = {'user_country': 'Country'}
@@ -47,9 +46,11 @@ class LoginForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput(attrs={'class': "form-control"}),)
 
 class ItemForm(forms.ModelForm):
+    item_category = forms.CharField(widget=forms.Select(choices=CAT_CHOICE), required=False, label='')
+
     class Meta:
         model = Item
-        fields = ('item_name', 'item_category', 'item_price', 'item_pic',)
+        fields = ('item_name', 'item_category', 'item_country', 'item_price', 'item_pic',)
 
 class UserDeleteForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput(attrs={'class': "form-control"}),)
@@ -57,18 +58,41 @@ class UserDeleteForm(forms.Form):
 
 class UserEditForm(forms.Form):
     new_username = forms.EmailField(label='New email', widget=forms.TextInput(attrs={'class': "form-control"}),)
-    new_country = forms.ChoiceField(choices=list(countries), widget=forms.Select(attrs={'class': 'form-control'}))
+    new_country = CountryField()
     old_password = forms.CharField(label="Old Password", widget=forms.PasswordInput(attrs={'class': "form-control"}),)
     new_password = forms.CharField(label="New Password", widget=forms.PasswordInput(attrs={'class': "form-control"}),)
 
 class SearchForm(forms.Form):
-    category_select = forms.CharField(widget=forms.Select(choices=CAT_CHOICE), required=False, label='')
+    category_select = forms.CharField(widget=forms.Select(choices=CAT_CHOICE, attrs={'class': "dropdown-select"}), required=False, label='Category')
     my_country = forms.BooleanField(required=False)
-    name_select = forms.CharField(widget=forms.Select(choices=SEARCH_ATTRIBUTES), required=False, label="Name")
+    name_select = forms.CharField(widget=forms.Select(choices=SEARCH_ATTRIBUTES, attrs={'class': "dropdown-select"}), required=False, label="Name")
+    price_select = forms.CharField(widget=forms.Select(choices=SEARCH_ATTRIBUTES, attrs={'class': "dropdown-select"}), required=False, label="Price")
     price_min = forms.FloatField(required=False)
     price_max = forms.FloatField(required=False)
-    date_select = forms.CharField(widget=forms.Select(choices=SEARCH_ATTRIBUTES), required=False)
-    after_date = forms.DateField(widget=forms.DateInput(format = '%Y-%m-%d'), required=False)
+    date_select = forms.CharField(widget=forms.Select(choices=SEARCH_ATTRIBUTES, attrs={'class': "dropdown-select"}), required=False)
+    after_date = forms.DateField(widget=forms.DateInput(), required=False)
+
+class ItemEditForm(forms.ModelForm):
+    class Meta:
+        model = ItemEdit
+        fields = ('item_list', 'item_name', 'item_category', 'item_country', 'item_price', 'item_pic',)
+
+    def __init__(self, user, *args, **kwargs):
+        super(ItemEditForm, self).__init__(*args, **kwargs)
+        self.user = user
+        user_profile = Profile.objects.get(user=user)
+        self.fields['item_list'].queryset = Item.objects.filter(item_owner=user_profile)
+
+class ItemDeleteForm(forms.ModelForm):
+    class Meta:
+        model = ItemEdit
+        fields = ('item_list',)
+
+    def __init__(self, user, *args, **kwargs):
+        super(ItemDeleteForm, self).__init__(*args, **kwargs)
+        self.user = user
+        user_profile = Profile.objects.get(user = user)
+        self.fields['item_list'].queryset = Item.objects.filter(item_owner=user_profile)
 
 
 

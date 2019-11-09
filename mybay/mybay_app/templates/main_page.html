@@ -1,3 +1,4 @@
+{% load static %}
 <!doctype html>
 <html lang="en">
 
@@ -9,6 +10,8 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/items_sel.css' %}">
+
 
 
     <title>MyBay</title>
@@ -39,33 +42,82 @@
             </ul>
             <form class="form-inline my-2 my-lg-0" method="post">
                 {% csrf_token %}
-                <input class="form-control mr-sm-2" name= "search_text" type="custom_search" placeholder="Search" aria-label="Search">
-                <button type="submit" name= "custom_search"class="btn btn-outline-light">Search</button>
+                <input class="form-control mr-sm-2" name="search_text" type="custom_search" placeholder="Search"
+                    aria-label="Search">
+                <button type="submit" name="custom_search" class="btn btn-outline-light">Search</button>
             </form>
         </div>
     </nav>
     <form method="post">
         {% csrf_token %}
-        {{ search_form }}
-        <button type="submit" name="search_form" class="btn btn-dark">Search</button>
+        <div class="search-center">
+            <label style="padding-right: 10px;">Category</label>
+            <div class="dropdown dropdown-dark">
+                {{search_form.category_select}}
+            </div>
+            <label style="padding-left: 30px;"">My Country</label>
+            {{search_form.my_country}}
+            <label style=" padding-left: 30px;padding-right: 10px;">Name</label>
+            <div class="dropdown dropdown-dark">
+                {{search_form.name_select}}
+            </div>
+        </div>
+        <div class="search-center">
+            <label style="padding-right:10px;">Price</label>
+            <div class="dropdown dropdown-dark">
+                {{search_form.price_select}}
+            </div>
+            <label style="padding-right:10px; padding-left:30px;">Min. Price</label>
+            {{ search_form.price_min }}
+            <label style="padding-left:30px; padding-right:10px;">Max. Price</label>
+            {{ search_form.price_max }}
+        </div>
+        <div class="search-center">
+            <label style="padding-right:10px;">Date</label>
+            <div class="dropdown dropdown-dark">
+                {{search_form.date_select}}
+            </div>
+            <label style="padding-left:30px; padding-right:10px;">After Date</label>
+            {{search_form.after_date}}
+        </div>
+        <div class="search-center" style="padding-bottom:30px;">
+            <button type="submit" name="search_form" class="btn btn-dark">Search</button>
+        </div>
+        </div>
     </form>
-    {% for item in item_list %}
-        {{ item.item_name }}<br>
-        {{ item.item_category }}<br>
-        {{ item.item_price }}<br>
-        <img src="{{ item.item_pic.url }}" /> 
-    {% endfor %}
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-        crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-        crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-        crossorigin="anonymous"></script>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-9 col-xs-12">
+                {% for item in item_list %}
+                <article>
+                    <div class="row">
+                        <div class="col-sm-6 col-md-4">
+                            <figure>
+                                <img src="{{ item.item_pic.url }}" />
+                            </figure>
+                        </div>
+                        <div class="col-sm-6 col-md-8">
+                            <br>
+                            <h4>{{ item.item_name }}</h4>
+                            <label><b>Category</b></label> {{item.item_category}}<br>
+                            <label><b>Country of Origin:</b></label> {{item.item_country.name}}<br>
+                            <label><b>Price:</b></label> {{item.item_price}}<br>
+                            <label><b>Added Date:</b></label> {{item.item_date}}
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
+                <!-- Optional JavaScript -->
+                <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+                <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+                    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+                    crossorigin="anonymous"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+                    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+                    crossorigin="anonymous"></script>
+                <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+                    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+                    crossorigin="anonymous"></script>
 </body>
 
 </html>

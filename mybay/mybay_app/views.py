@@ -3,11 +3,12 @@ from __future__ import unicode_literals
 
 from django.shortcuts import render, redirect
 from django.views.generic import View
-from mybay_app.forms import SignUpForm, ProfileForm, LoginForm, ItemForm, UserDeleteForm, UserEditForm, SearchForm
+from mybay_app.forms import SignUpForm, ProfileForm, LoginForm, ItemForm, UserDeleteForm, UserEditForm, SearchForm, ItemEditForm, ItemDeleteForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.hashers import make_password, check_password
-from mybay_app.models import Profile, Item
+from mybay_app.models import Profile, Item, ItemEdit
 from django.contrib import messages
+import datetime
 
 class home_view(View):
     def get(self, request):
@@ -79,9 +80,10 @@ class item_view(View):
             item_owner = Profile.objects.get(user=request.user)
             item_form.item_owner = item_owner
             item_form.save()
+            print("lol: ", item_form.item_pic)
             item_form = ItemForm()
             messages.success(request, 'Item added')
-            return render(request, 'item.html', {'item_form': item_form})
+            return redirect('item')
         else:
             # meter erro aqui
             print("Erro")
@@ -109,7 +111,7 @@ class user_delete_view(View):
             return redirect('home')
         else:
             #meter erro aqui
-            return render(request, 'user_delete.html', {'user_delete_form': user_delete_form})
+            return redirect('itemdelete')
 
 class user_edit_view(View):
     def get(self, request):
@@ -129,24 +131,11 @@ class user_edit_view(View):
             user_profile.user_country = user_edit_form.data['new_country']
             user.save()
             user_profile.save()
-            return render(request, 'home.html')
+            return redirect('profile')
         else:
             #meter erro aqui
             print('erro')
-            return render(request, 'user_edit.html', {'user_edit_form': user_edit_form})
-
-class item_edit_view(View):
-    def get(self, request):
-        if not request.user.is_authenticated:
-            return redirect('home')
-        return render(request, 'item_edit.html')
-
-    def post(self, request):
-        user = request.user
-        user_profile = Profile.objects.get(user=user) 
-        list_of_items = Item.objects.filter(item_owner=user_profile)
-        print(list_of_items)
-        return render(request, 'item_edit.html')
+            return redirect('useredit')
 
 class home_page_view(View):
     def get(self, request):
@@ -169,16 +158,10 @@ class home_page_view(View):
                 my_country = search_form.cleaned_data.get('my_country')
                 name_select = search_form.cleaned_data.get('name_select')
                 price_min = search_form.cleaned_data.get('price_min')
+                price_select = search_form.cleaned_data.get('price_select')
                 price_max = search_form.cleaned_data.get('price_max')
                 date_select = search_form.cleaned_data.get('date_select')
                 after_date = search_form.cleaned_data.get('after_date')
-                print("form info")
-                print("my_country: ", my_country)
-                print("name_select: ", name_select)
-                print("price_min: ", price_min)
-                print("price_max: ", price_max)
-                print("date_select: ", date_select)
-                print("after_date: ", after_date)
 
                 #fetch all objects
                 item_list = Item.objects.all()
@@ -188,6 +171,16 @@ class home_page_view(View):
                     item_list = Item.objects.filter(item_category=cat_sel)
                 
                 #fazer para country
+                if my_country:
+                    my_prof = Profile.objects.get(user=request.user)
+                    item_list = item_list.filter(item_country=my_prof.user_country)
+                
+                #if ascending or descending is selected by price, filter by it
+                if price_select is not '':
+                    if name_select == 'ascending':
+                        item_list = item_list.order_by('item_price')
+                    else:
+                        item_list = item_list.order_by('-item_price')
                 
                 #if ascending or descending is selected by name, filter by it
                 if name_select is not '':
@@ -211,7 +204,8 @@ class home_page_view(View):
                         item_list = item_list.order_by('-item_date')
                 
                 if after_date is not None:
-                    item_list = item_list.order_by(item_date__gt=after_date)
+                    fixed_date = datetime.date(after_date.year, after_date.day, after_date.month)
+                    item_list = item_list.filter(item_date__gt=fixed_date)
                 
                 search_form = SearchForm()
                 print(item_list)
@@ -229,7 +223,40 @@ class profile_view(View):
         item_list = Item.objects.filter(item_owner=my_profile).order_by('item_date')
         return render(request, 'profile.html', {'item_list': item_list})
     def post(self, request):
-        return render(request, 'profile.html')
+        return redirect('profile')
+
+
+class item_edit_view(View):
+    def get(self, request):
+        item_edit_form = ItemEditForm(request.user)
+        return render(request, 'item_edit.html', {'item_edit_form': item_edit_form})
+
+    def post(self, request):
+        item_edit_form = ItemEditForm(request.user, data=request.POST, files=request.FILES)
+        item_on_focus = Item.objects.get(pk=item_edit_form.data['item_list'])
+        item_on_focus.item_name = item_edit_form.data['item_name']
+        item_on_focus.item_category = item_edit_form.data['item_category']
+        item_on_focus.item_price = item_edit_form.data['item_price']
+        item_on_focus.item_pic = item_edit_form.files['item_pic']
+        item_on_focus.save()
+        return redirect('item')
+        
+class item_delete_view(View):
+    def get(self, request):
+        item_delete_form = ItemDeleteForm(request.user)
+        return render(request, 'item_delete.html', {'item_delete_form': item_delete_form})
+
+    def post(self, request):
+        item_delete_form = ItemDeleteForm(request.user, request.POST)
+        item_on_focus = Item.objects.get(pk=item_delete_form.data['item_list'])
+        item_on_focus.delete()
+        return redirect('item')
+
+
+class test_items(View):
+    def get(self, request):
+        item_list = Item.objects.all()
+        return render(request, 'test_items.html', {'item_list': item_list})
 
     
  

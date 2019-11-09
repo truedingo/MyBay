@@ -1,7 +1,7 @@
 {% block content %}
-  <form method="post" enctype="multipart/form-data">
+  <form method="post">
     {% csrf_token %}
-    {{ item_edit_form.as_p }}
+    {{ item_delete_form.as_p }}
     <button type="submit">Save</button>
   </form>
 {% endblock %} 
