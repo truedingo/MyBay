@@ -9,6 +9,15 @@ from django.contrib.auth.hashers import make_password, check_password
 from mybay_app.models import Profile, Item, ItemEdit
 from django.contrib import messages
 import datetime
+import logging
+
+log = logging.getLogger('views.py')
+log.setLevel(logging.INFO)  # DEBUG
+
+fmt = logging.Formatter('%(levelname)s:%(name)s:%(message)s')
+h = logging.StreamHandler()
+h.setFormatter(fmt)
+log.addHandler(h)
 
 class home_view(View):
     def get(self, request):
@@ -26,8 +35,10 @@ class home_view(View):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
+                log.info("User " + user.username + ' has entered MyBay')
                 return redirect('mainpage')
             else:
+                log.info("Error loggining in user")
                 return redirect('mainpage')
         else:
             return render(request, 'home.html', {"login_form": login_form})
@@ -58,10 +69,11 @@ class signup_view(View):
                 prof_form = prof_form.save(commit=False)
                 prof_form.user = request.user
                 prof_form.save()
+                log.info("User " + user.username + ' has registered MyBay')
                 return redirect('mainpage')
             else:
-                # meter mensagem de erro aqui
-                print("Erro")
+                log.info("Error registering user")
+                return redirect('home')
         else:
             return render(request, 'signup.html', {"signup_form": signup_form, "prof_form": prof_form})
     
@@ -79,16 +91,17 @@ class item_view(View):
             item_owner = Profile.objects.get(user=request.user)
             item_form.item_owner = item_owner
             item_form.save()
-            print("lol: ", item_form.item_pic)
-            item_form = ItemForm()
             messages.success(request, 'Item added')
+            log.info("User " + request.user.username + ' has added item ' + item_form.item_name)
+            item_form = ItemForm()
             return redirect('item')
         else:
-            # meter erro aqui
+            log.info("User " + request.user.username + ' had an error while adding an item')
             messages.error(request, 'Problem adding item, check your fields.')
             return redirect('item')
 
 def logout_view(request):
+    log.info("User " + request.user.username + ' has logged out MyBay')
     logout(request)
     login_form = LoginForm()
     return redirect('home')
@@ -105,13 +118,14 @@ class user_delete_view(View):
         user_delete_form = UserDeleteForm(request.POST)
         user = request.user
         if user_delete_form.data['password'] == user_delete_form.data['password_check'] and user.check_password(user_delete_form.data['password']):
+            log.info("User " + request.user.username + ' deleted their account')
             user_profile = Profile.objects.get(user=user)
             user.delete()
             user_profile.delete()
             return redirect('home')
         else:
-            #meter erro aqui
-            return redirect('itemdelete')
+            log.info("User " + request.user.username + ' had an error deleting their account')
+            return redirect('userdelete')
 
 class user_edit_view(View):
     def get(self, request):
@@ -136,11 +150,14 @@ class user_edit_view(View):
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
+                log.info("User " + user.username + ' changed their account details')
                 return redirect('profile')
             else:
+                log.info("User " + request.user.username + ' had an error editing their account details')
                 return redirect('home')
         else:
             #meter erro aqui
+            log.info("User " + request.user.username + ' had an error editing their account details')
             print('erro')
             return redirect('useredit')
 
@@ -215,7 +232,7 @@ class home_page_view(View):
                     item_list = item_list.filter(item_date__gt=fixed_date)
                 
                 search_form = SearchForm()
-                print(item_list)
+                log.info("User " + request.user.username + ' requested a search')
                 return render(request, 'main_page.html', {'item_list': item_list, 'search_form': search_form})
             else:
                 #erro
@@ -250,6 +267,7 @@ class item_edit_view(View):
         item_on_focus.item_pic = item_edit_form.files['item_pic']
         item_on_focus.save()
         messages.success(request, 'Item editted')
+        log.info("User " + request.user.username + ' editted an item')
         return redirect('itemedit')
         
 class item_delete_view(View):
@@ -264,6 +282,7 @@ class item_delete_view(View):
         item_on_focus = Item.objects.get(pk=item_delete_form.data['item_list'])
         item_on_focus.delete()
         messages.success(request, 'Item deleted')
+        log.info("User " + request.user.username + ' deleted an item')
         return redirect('itemdelete')
 
     
